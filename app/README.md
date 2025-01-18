@@ -19,3 +19,8 @@ This is a repository for Example app
 * Navigate to the folder where your project located, select choose app folder 
 * Wait for gradle to finish sync
 * Run app using Run app button (control+R)
+
+## What should be done
+Error handling
+Better Logging
+Some unit tests would be nice :)

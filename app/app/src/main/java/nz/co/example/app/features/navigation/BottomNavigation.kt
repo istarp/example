@@ -1,0 +1,49 @@
+package nz.co.example.app.features.navigation
+
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import nz.co.example.app.features.navigation.models.FavouritesRoute
+import nz.co.example.app.features.navigation.models.topLevelRoutes
+import nz.co.example.app.ui.theme.AppTheme
+
+@Composable
+internal fun BottomNavigation(currentDestination: String?, onItemClicked: (String) -> Unit) {
+    NavigationBar {
+        topLevelRoutes.forEach { topLevelRoute ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        painter = painterResource(topLevelRoute.icon),
+                        contentDescription = stringResource(topLevelRoute.title)
+                    )
+                },
+                label = { Text(stringResource(topLevelRoute.title)) },
+                selected = topLevelRoute.route == currentDestination,
+                onClick = { onItemClicked(topLevelRoute.route) }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun Preview() {
+    AppTheme {
+        Surface {
+            BottomNavigation(currentDestination = FavouritesRoute.route, onItemClicked = {})
+        }
+    }
+}

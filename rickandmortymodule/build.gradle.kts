@@ -16,6 +16,10 @@ android {
 dependencies {
     implementation(project(":modules:coremodule"))
 
+    implementation(sharedLibs.bundles.compose)
     implementation(sharedLibs.bundles.android)
-    implementation(sharedLibs.bundles.network)
+    implementation(platform(sharedLibs.ktor.bom))
+    implementation(sharedLibs.bundles.ktor)
+
+    implementation(sharedLibs.androidx.paging.compose)
 }

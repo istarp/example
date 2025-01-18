@@ -15,5 +15,6 @@ android {
 
 dependencies {
     implementation(sharedLibs.bundles.android)
-    implementation(sharedLibs.bundles.network)
+    implementation(platform(sharedLibs.ktor.bom))
+    implementation(sharedLibs.bundles.ktor)
 }

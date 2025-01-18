@@ -1,4 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
     <string name="app_name">Example</string>
+    <string name="nav_characters">Characters</string>
+    <string name="nav_favourites">Favourite</string>
 
+    <string name="loading_data">Loading</string>
+    <string name="error">Sorry, errors are not handled, better to restart app and be sure you have internet connection</string>
 </resources>

@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import nz.co.example.coremodule.CoreFacade
 import nz.co.example.coremodule.utils.ApplicationContext
 
-internal class ResourcesRepository(private val applicationContext: ApplicationContext = CoreFacade.applicationContext) {
+internal class ResourcesRepository(private val applicationContext: ApplicationContext) {
     fun getString(@StringRes id: Int): String {
         return applicationContext.getString(id)
     }

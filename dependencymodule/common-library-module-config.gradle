@@ -58,6 +58,7 @@ dependencies {
     implementation(sharedLibs.bundles.kotlin)
     implementation(sharedLibs.bundles.kotlin.serialization)
     implementation(sharedLibs.bundles.android.core)
+    implementation(sharedLibs.bundles.koin.core)
 
     testImplementation(sharedLibs.bundles.test.junit)
 }

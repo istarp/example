@@ -1,16 +1,23 @@
 package nz.co.example.app
 
 import android.app.Application
-import nz.co.example.coremodule.CoreFacade
-import nz.co.example.rickandmortymodule.RickAndMortyFacade
+import nz.co.example.app.di.appModule
+import nz.co.example.coremodule.di.coreModule
+import nz.co.example.rickandmortymodule.features.di.rickAndMortyModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 @Suppress("unused")
 class ExampleApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        CoreFacade.init(this)
-        RickAndMortyFacade.init()
+        startKoin {
+            androidLogger()
+            androidContext(this@ExampleApplication)
+            modules(appModule, rickAndMortyModule, coreModule)
+        }
     }
 
 }

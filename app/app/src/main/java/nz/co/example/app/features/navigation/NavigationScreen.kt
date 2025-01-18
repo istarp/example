@@ -1,47 +1,87 @@
 package nz.co.example.app.features.navigation
 
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import nz.co.example.app.features.dashboard.DashboardScreen
-import nz.co.example.app.features.navigation.models.UIOAppNavigation
-import nz.co.example.app.features.navigation.models.UIONavigationRoute
-import nz.co.example.app.features.tutorial.TutorialScreen
-import nz.co.example.app.features.welcome.WelcomeScreen
+import nz.co.example.app.features.characterdetail.CharacterDetailScreen
+import nz.co.example.app.features.characters.CharactersScreen
+import nz.co.example.app.features.favouritecharacters.FavouriteCharactersScreen
+import nz.co.example.app.features.navigation.models.AppNavigationRoute
+import nz.co.example.app.features.navigation.models.GenericNavigation
+import nz.co.example.app.features.navigation.models.NavigationUp
+import nz.co.example.app.features.navigation.models.RouteNavigation
+import nz.co.example.app.features.navigation.models.topLevelRoutes
 
 @Composable
 internal fun NavigationScreen(
-    modifier: Modifier,
-    startDestination: UIONavigationRoute,
-    navController: AppNavController
+    navController: NavHostController,
+    startDestination: String,
+    modifier: Modifier
 ) {
     NavHost(
-        navController.mainNavController,
-        startDestination = startDestination.value,
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
+        navController = navController,
+        startDestination = startDestination,
+        modifier = Modifier.fillMaxSize()
     ) {
-        composable(UIOAppNavigation.Tutorial.route.value) {
-            TutorialScreen(
+        composable(
+            AppNavigationRoute.Characters.route,
+            exitTransition = exitTransition(),
+            popEnterTransition = popEnterTransition()
+        ) {
+            CharactersScreen(
                 modifier = modifier,
-                navController = navController
+                onNavigate = { handleNavigation(it, navController) }
             )
         }
-        composable(UIOAppNavigation.Welcome.route.value) {
-            WelcomeScreen(
+        composable(AppNavigationRoute.CharacterDetail().route,
+            enterTransition = { slideInFromLeft() },
+            exitTransition = { slideOutToRight() })
+        { entry ->
+            CharacterDetailScreen(
                 modifier = modifier,
-                navController = navController
+                characterId = AppNavigationRoute.CharacterDetail.getArg(entry),
+                onNavigate = { handleNavigation(it, navController) })
+        }
+        composable(
+            AppNavigationRoute.Favourites.route,
+            exitTransition = exitTransition(),
+            popEnterTransition = popEnterTransition()
+        ) {
+            FavouriteCharactersScreen(
+                modifier = modifier
             )
         }
-        composable(UIOAppNavigation.Dashboard.route.value) {
-            DashboardScreen(
-                modifier = modifier,
-                navController = navController
-            )
+    }
+}
+
+private fun exitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+    {
+        if (topLevelRoutes.map { it.route }.contains(targetState.destination.route)) {
+            fadeOut()
+        } else {
+            slideOutToLeft()
         }
+    }
+
+private fun popEnterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+    {
+        if (topLevelRoutes.map { it.route }.contains(initialState.destination.route)) {
+            fadeIn()
+        } else {
+            slideInFromRight()
+        }
+    }
+
+private fun handleNavigation(navigation: GenericNavigation, navController: NavHostController) {
+    when (navigation) {
+        NavigationUp -> navController.navigateUp()
+        is RouteNavigation -> navController.navigate(navigation.value)
     }
 }

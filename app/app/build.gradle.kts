@@ -64,8 +64,16 @@ android {
         jvmTarget = nz.co.example.config.ModuleConfig.kotlinJvmTarget
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
-            "-opt-in=kotlin.OptIn"
+            "-opt-in=kotlin.OptIn",
+            "-Xuse-k2",
+            "-Xcontext-receivers"
         )
+    }
+
+    kotlin {
+        sourceSets.all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
     }
 
     buildFeatures {
@@ -115,6 +123,8 @@ dependencies {
     implementation(platform(sharedLibs.compose.bom))
     implementation(sharedLibs.bundles.compose)
     implementation(sharedLibs.bundles.kotlin.serialization)
+
+    implementation(sharedLibs.androidx.paging.compose)
 
     debugImplementation(sharedLibs.bundles.compose.debug)
 
