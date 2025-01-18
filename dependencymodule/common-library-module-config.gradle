@@ -1,0 +1,64 @@
+import nz.co.example.config.ModuleConfig
+
+//This should be ideally gradle kts. But due some issues/bugs, we are not able to reuse this as kts within multi module projects. Maybe in future those issues will be resolved by gradle team.
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdk ModuleConfig.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion ModuleConfig.minSdkVersion
+        targetSdkVersion ModuleConfig.targetSdkVersion
+    }
+
+    compileOptions {
+        sourceCompatibility = ModuleConfig.jvmTarget
+        targetCompatibility = ModuleConfig.jvmTarget
+    }
+
+    kotlinOptions {
+        jvmTarget = ModuleConfig.kotlinJvmTarget
+        freeCompilerArgs += [
+                "-opt-in=kotlin.RequiresOptIn",
+                "-opt-in=kotlin.OptIn"
+        ]
+    }
+
+    buildTypes {
+        debug {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+
+        release {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        unitTests.all {
+            minHeapSize = "128m"
+            maxHeapSize = "1024m"
+            useJUnitPlatform()
+            testLogging {
+                exceptionFormat "full"
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+            }
+        }
+    }
+
+    lint {
+        //Lint is complaining that scope is missing for @RestrictTo. But we provide it. Looks like lint bug for annotations used in Kotlin.
+        disable 'SupportAnnotationUsage'
+    }
+}
+
+dependencies {
+    implementation(sharedLibs.bundles.kotlin)
+    implementation(sharedLibs.bundles.kotlin.serialization)
+    implementation(sharedLibs.bundles.android.core)
+
+    testImplementation(sharedLibs.bundles.test.junit)
+}
+

@@ -1,0 +1,9 @@
+//These dependencies are supposed to be used in top level gradle files.
+//Due gradle kts issues, we are not able to refer this value from buildSrc in top level gradle files.0
+
+def kotlinVersion = "1.9.23" //version needs to match shared-libs.versions.toml
+def gradleBuildTools = "8.6.0" //version needs to match shared-libs.versions.toml
+
+ext.kotlinGradlePluginDependency = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+ext.kotlinSerializationDependency = "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
+ext.gradleBuildToolsDependency = "com.android.tools.build:gradle:$gradleBuildTools"
