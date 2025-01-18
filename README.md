@@ -21,6 +21,6 @@ This is a repository for Example app
 * Run app using Run app button (control+R)
 
 ## What should be done
-Error handling
-Better Logging
-Some unit tests would be nice :)
+* Error handling
+* Better Logging
+* Some more unit tests would be nice :)
