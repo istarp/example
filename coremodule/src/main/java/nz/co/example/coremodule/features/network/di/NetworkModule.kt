@@ -24,7 +24,7 @@ private const val TIMEOUT = 6_000L
 
 val networkModule = module {
     single {
-        //this should be ideally abstracted
+        //todo this should be ideally abstracted so ktor is not leaked to higher modules
         HttpClient(Android) {
             install(ContentNegotiation) {
                 json(

@@ -23,6 +23,7 @@ kotlin-ksp = "1.9.25-1.0.20" #once kotlin version is updated, update ksp as well
 kotlin-coroutines = "1.9.0"
 kotlin-serialization-json = "1.6.3"
 ktor = "2.3.0"
+room = "2.6.1"
 
 ##testing libs
 junit5 = "5.8.2"
@@ -44,6 +45,10 @@ androidx-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-liveda
 androidx-lifecycle-extensions = { group = "androidx.lifecycle", name = "lifecycle-extensions", version.ref = "androidx-lifecycle-extensions" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidx-paging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
 
 compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose"}
@@ -105,6 +110,8 @@ koin-android = ["koin-core", "koin-android", "koin-compose"]
 kotlin = ["kotlin-jdk8", "kotlin-coroutines-core"]
 kotlin-serialization = ["kotlin-serialiation-json"]
 ktor = ["ktor-android-client", "ktor-content-negotation", "ktor-logging", "ktor-serialization"]
+room = ["androidx-room-paging", "androidx-room-runtime", "androidx-room-ktx"]
+room-compiler = ["androidx-room-compiler"]
 
 #testing libs
 test-junit = [

@@ -55,7 +55,8 @@ internal fun NavigationScreen(
             popEnterTransition = popEnterTransition()
         ) {
             FavouriteCharactersScreen(
-                modifier = modifier
+                modifier = modifier,
+                onNavigate = { handleNavigation(it, navController) }
             )
         }
     }

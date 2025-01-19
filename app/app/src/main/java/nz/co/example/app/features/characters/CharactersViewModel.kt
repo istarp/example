@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import nz.co.example.app.features.characters.models.UIOCharacter
+import nz.co.example.app.features.characters.models.UIOCharacterScreenState
 import nz.co.example.app.features.characters.models.mapFrom
 import nz.co.example.rickandmortymodule.RickAndMortyFacade
 
@@ -18,7 +20,19 @@ internal class CharactersViewModel(private val rickAndMortyFacade: RickAndMortyF
     val data: StateFlow<PagingData<UIOCharacter>>
         field = MutableStateFlow(PagingData.empty())
 
+    val searchData: StateFlow<PagingData<UIOCharacter>>
+        field = MutableStateFlow(PagingData.empty())
+
+    val state: StateFlow<UIOCharacterScreenState>
+        field = MutableStateFlow(UIOCharacterScreenState.default())
+
+    private var searchCollectionJob: Job? = null
+
     init {
+        collectData()
+    }
+
+    private fun collectData() {
         viewModelScope.launch {
             rickAndMortyFacade.characters.getCharacters()
                 .distinctUntilChanged()
@@ -31,64 +45,36 @@ internal class CharactersViewModel(private val rickAndMortyFacade: RickAndMortyF
         }
     }
 
-//    val data: LiveData<LCEState<Unit>> get() = _data
-//    private val _data = MutableLiveData<LCEState<Unit>>(LCEState.Loading())
+    fun onToggleSearch() {
+        val isSearching = !state.value.isSearching
+        if (!isSearching) {
+            searchCollectionJob = null
+            searchData.value = PagingData.empty()
+        }
+        state.value = state.value.copy(
+            isSearching = isSearching,
+            searchText = if (!isSearching) "" else state.value.searchText
+        )
+    }
 
-//    init {
-//        performLaunch()
-//    }
-//
-//    private fun performLaunch() {
-//        viewModelScope.launchSafely(launchExceptionHandler()) {
-//            _data.value = LCEState.Loading()
-//            launchFeature.performLaunch()
-//            val boData = launchFeature.getLaunchPage()
-//            emitShowNavBarEventsIfFlightsPage(boData)
-//            recordLaunchFinished()
-//            navigateToLaunchPage(boData)
-//        }
-//    }
-//
-//    private fun launchExceptionHandler() = viewModelExceptionHandler(
-//        viewModelScope,
-//        fullScreenErrorHandler = fullScreenErrorHandler()
-//    )
-//
-//    private fun recordLaunchFinished() {
-//        scopes.app().launchSafely {
-//            launchFeature.recordLaunchFinished()
-//        }
-//    }
-//
-//    private fun emitShowNavBarEventsIfFlightsPage(boData: LaunchPage) {
-//        when (boData) {
-//            LaunchPage.Flights -> navBarEvents.emitShow()
-//            LaunchPage.Tutorial, LaunchPage.Welcome -> {
-//                //do nothing
-//            }
-//        }
-//    }
-//
-//    private suspend fun navigateToLaunchPage(boData: LaunchPage) {
-//        transitionController.overrideForNextTransition(UIOTransitionType.NONE)
-//        navigationEvents.emit(
-//            UIONavigationRoute(
-//                UIOLaunchPage.toUIO(boData).navigation.route.value,
-//                UIONavArgs(NavOperation.PopAll)
-//            )
-//        )
-//    }
-//
-//    private fun fullScreenErrorHandler() = FullScreenErrorHandler {
-//        _data.value = LCEState.Error(it) { performLaunch() }
-//        viewModelScope.launchSafely {
-//            launchFeature.recordLaunchFinished()
-//        }
-//    }
-//
-//    fun onLongPress() {
-//        viewModelScope.launchSafely {
-//            navigationEvents.emit(UIOInAppNavigation.DevSettings.route)
-//        }
-//    }
+    fun onSearchTextChange(text: String) {
+        searchCollectionJob?.cancel()
+        state.value = state.value.copy(searchText = text)
+        if (text.isBlank()) {
+            searchData.value = PagingData.empty()
+        } else {
+            //todo ideally add some throttling
+            searchCollectionJob = viewModelScope.launch {
+                rickAndMortyFacade.characters.searchCharacters(text)
+                    .distinctUntilChanged()
+                    .cachedIn(viewModelScope)
+                    .collect { pagingData ->
+                        searchData.value = pagingData.map {
+                            mapFrom(it)
+                        }
+                    }
+            }
+        }
+    }
+
 }

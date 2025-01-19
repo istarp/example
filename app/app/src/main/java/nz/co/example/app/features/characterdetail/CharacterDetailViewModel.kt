@@ -2,78 +2,44 @@ package nz.co.example.app.features.characterdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.map
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import nz.co.example.app.features.characters.models.UIOCharacter
 import nz.co.example.app.features.characters.models.mapFrom
+import nz.co.example.app.ui.lce.LCEState
+import nz.co.example.coremodule.common.Result
 import nz.co.example.rickandmortymodule.RickAndMortyFacade
 
-internal class CharacterDetailViewModel(private val rickAndMortyFacade: RickAndMortyFacade) : ViewModel() {
+internal class CharacterDetailViewModel(
+    private val id: String, private val rickAndMortyFacade: RickAndMortyFacade
+) : ViewModel() {
 
+    val data: StateFlow<LCEState<UIOCharacter>>
+        field = MutableStateFlow<LCEState<UIOCharacter>>(LCEState.Loading())
 
-//    val data: LiveData<LCEState<Unit>> get() = _data
-//    private val _data = MutableLiveData<LCEState<Unit>>(LCEState.Loading())
+    init {
+        collectData()
+    }
 
-//    init {
-//        performLaunch()
-//    }
-//
-//    private fun performLaunch() {
-//        viewModelScope.launchSafely(launchExceptionHandler()) {
-//            _data.value = LCEState.Loading()
-//            launchFeature.performLaunch()
-//            val boData = launchFeature.getLaunchPage()
-//            emitShowNavBarEventsIfFlightsPage(boData)
-//            recordLaunchFinished()
-//            navigateToLaunchPage(boData)
-//        }
-//    }
-//
-//    private fun launchExceptionHandler() = viewModelExceptionHandler(
-//        viewModelScope,
-//        fullScreenErrorHandler = fullScreenErrorHandler()
-//    )
-//
-//    private fun recordLaunchFinished() {
-//        scopes.app().launchSafely {
-//            launchFeature.recordLaunchFinished()
-//        }
-//    }
-//
-//    private fun emitShowNavBarEventsIfFlightsPage(boData: LaunchPage) {
-//        when (boData) {
-//            LaunchPage.Flights -> navBarEvents.emitShow()
-//            LaunchPage.Tutorial, LaunchPage.Welcome -> {
-//                //do nothing
-//            }
-//        }
-//    }
-//
-//    private suspend fun navigateToLaunchPage(boData: LaunchPage) {
-//        transitionController.overrideForNextTransition(UIOTransitionType.NONE)
-//        navigationEvents.emit(
-//            UIONavigationRoute(
-//                UIOLaunchPage.toUIO(boData).navigation.route.value,
-//                UIONavArgs(NavOperation.PopAll)
-//            )
-//        )
-//    }
-//
-//    private fun fullScreenErrorHandler() = FullScreenErrorHandler {
-//        _data.value = LCEState.Error(it) { performLaunch() }
-//        viewModelScope.launchSafely {
-//            launchFeature.recordLaunchFinished()
-//        }
-//    }
-//
-//    fun onLongPress() {
-//        viewModelScope.launchSafely {
-//            navigationEvents.emit(UIOInAppNavigation.DevSettings.route)
-//        }
-//    }
+    fun onToggleFavourite() {
+        val current = (data.value as? LCEState.Content)?.value ?: return
+        viewModelScope.launch {
+            rickAndMortyFacade.characters.setFavouriteCharacter(current.id.toString(), current.isFavourite.not())
+        }
+    }
+
+    private fun collectData() {
+        viewModelScope.launch {
+            rickAndMortyFacade.characters.getCharacter(id)
+                .collect { result ->
+                    data.value = when (result) {
+                        is Result.Data -> LCEState.Content(mapFrom(result.data))
+                        is Result.Error -> LCEState.Error(result.exception.message ?: "")
+                        Result.Loading -> LCEState.Loading()
+                    }
+                }
+        }
+    }
+
 }
