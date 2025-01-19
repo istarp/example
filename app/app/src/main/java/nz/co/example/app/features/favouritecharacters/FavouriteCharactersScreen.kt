@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nz.co.example.app.R
-import nz.co.example.app.features.characters.models.UIOCharacter
+import nz.co.example.app.ui.components.charactercard.model.UIOCharacterCard
 import nz.co.example.app.features.navigation.models.AppNavigationRoute
 import nz.co.example.app.features.navigation.models.GenericNavigation
 import nz.co.example.app.features.navigation.models.RouteNavigation
@@ -47,7 +47,7 @@ internal fun FavouriteCharactersScreen(
 
 @Composable
 private fun Layout(
-    data: List<UIOCharacter>,
+    data: List<UIOCharacterCard>,
     onNavigate: (GenericNavigation) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -91,7 +91,7 @@ private fun Layout(
 private fun Preview() {
     AppTheme {
         Surface {
-            Layout(data = UIOCharacter.forPreviewList(), onNavigate = {})
+            Layout(data = UIOCharacterCard.forPreviewList(), onNavigate = {})
         }
     }
 }

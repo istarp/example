@@ -52,6 +52,7 @@ android {
         release {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), File("proguard-rules.pro"))
         }
     }
@@ -119,6 +120,7 @@ dependencies {
 
     implementation(sharedLibs.bundles.kotlin)
     implementation(sharedLibs.bundles.android)
+    implementation(sharedLibs.bundles.coil)
     implementation(sharedLibs.bundles.koin.android)
     implementation(platform(sharedLibs.compose.bom))
     implementation(sharedLibs.bundles.compose)

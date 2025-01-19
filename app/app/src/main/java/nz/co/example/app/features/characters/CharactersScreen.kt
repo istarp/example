@@ -10,8 +10,10 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +47,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import nz.co.example.app.R
-import nz.co.example.app.features.characters.models.UIOCharacter
 import nz.co.example.app.features.characters.models.UIOCharacterScreenState
 import nz.co.example.app.features.navigation.fadeIn
 import nz.co.example.app.features.navigation.fadeOut
@@ -52,6 +54,8 @@ import nz.co.example.app.features.navigation.models.AppNavigationRoute
 import nz.co.example.app.features.navigation.models.GenericNavigation
 import nz.co.example.app.features.navigation.models.RouteNavigation
 import nz.co.example.app.ui.components.BackButton
+import nz.co.example.app.ui.components.charactercard.CharacterCard
+import nz.co.example.app.ui.components.charactercard.model.UIOCharacterCard
 import nz.co.example.app.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,7 +69,7 @@ internal fun CharactersScreen(
     val filteredCharacters = viewModel.searchData.collectAsLazyPagingItems()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier) {
         Layout(
             state = state,
             characters = characters,
@@ -80,8 +84,8 @@ internal fun CharactersScreen(
 @Composable
 private fun Layout(
     state: UIOCharacterScreenState,
-    characters: LazyPagingItems<UIOCharacter>,
-    filteredCharacters: LazyPagingItems<UIOCharacter>,
+    characters: LazyPagingItems<UIOCharacterCard>,
+    filteredCharacters: LazyPagingItems<UIOCharacterCard>,
     onNavigate: (GenericNavigation) -> Unit,
     onSearchTextChange: (String) -> Unit,
     onToggleSearch: () -> Unit,
@@ -91,81 +95,86 @@ private fun Layout(
         onToggleSearch()
     }
     Column(modifier = modifier) {
-        TopAppBar(
-            modifier = Modifier,
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent,
-                //      titleContentColor = SolarTheme.colors.backgroundPrimary,
-                scrolledContainerColor = Color.Transparent
-            ),
-            expandedHeight = 60.dp,
-            title = {
-                Box(contentAlignment = Alignment.CenterStart) {
-                    Text(
-                        text = stringResource(R.string.characters_title),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    androidx.compose.animation.AnimatedVisibility(
-                        modifier = Modifier,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                        visible = state.isSearching
-                    ) {
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = state.searchText,
-                            onValueChange = { text ->
-                                onSearchTextChange(text)
-                            },
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.search_characters_placeholder),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+        Surface(shadowElevation = 8.dp) {
+            TopAppBar(
+                modifier = Modifier,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppTheme.colors.background.backgroundPrimary,
+                    scrolledContainerColor = Color.Transparent
+                ),
+                expandedHeight = 48.dp,
+                title = {
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        Text(
+                            text = stringResource(R.string.characters_title),
+                            maxLines = 1,
+                            style = AppTheme.typography.headline.headline2,
+                            color = AppTheme.colors.foreground.foregroundPrimary,
+                            fontWeight = FontWeight.Bold,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        androidx.compose.animation.AnimatedVisibility(
+                            modifier = Modifier,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                            visible = state.isSearching
+                        ) {
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = state.searchText,
+                                onValueChange = { text ->
+                                    onSearchTextChange(text)
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(R.string.search_characters_placeholder),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                },
+                                colors = TextFieldDefaults.colors(
+                                    unfocusedContainerColor = Color.Gray,
+                                    focusedContainerColor = Color.Gray,
+                                    unfocusedIndicatorColor = Color.Gray,
+                                    focusedIndicatorColor = Color.Gray
                                 )
-                            },
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Color.Gray,
-                                focusedContainerColor = Color.Gray,
-                                unfocusedIndicatorColor = Color.Gray,
-                                focusedIndicatorColor = Color.Gray
                             )
-                        )
 
+                        }
+                    }
+                },
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = state.isSearching,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        BackButton(onClick = { onToggleSearch() })
+                    }
+                },
+                actions = {
+                    AnimatedVisibility(visible = !state.isSearching) {
+                        IconButton(modifier = modifier, onClick = { onToggleSearch() }) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(R.drawable.ic_search),
+                                contentDescription = stringResource(R.string.content_desc_search_characters),
+                                tint = AppTheme.colors.foreground.foregroundPrimary,
+                            )
+                        }
+                    }
+                    AnimatedVisibility(visible = state.isSearching && state.searchText.isNotBlank()) {
+                        IconButton(modifier = modifier, onClick = { onSearchTextChange("") }) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(R.drawable.ic_close),
+                                contentDescription = stringResource(R.string.content_desc_search_characters)
+                            )
+                        }
                     }
                 }
-            },
-            navigationIcon = {
-                AnimatedVisibility(
-                    visible = state.isSearching,
-                    enter = expandHorizontally(),
-                    exit = shrinkHorizontally()
-                ) {
-                    BackButton(onClick = { onToggleSearch() })
-                }
-            },
-            actions = {
-                AnimatedVisibility(visible = !state.isSearching) {
-                    IconButton(modifier = modifier, onClick = { onToggleSearch() }) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.ic_search),
-                            contentDescription = stringResource(R.string.content_desc_search_characters)
-                        )
-                    }
-                }
-                AnimatedVisibility(visible = state.isSearching && state.searchText.isNotBlank()) {
-                    IconButton(modifier = modifier, onClick = { onSearchTextChange("") }) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.ic_close),
-                            contentDescription = stringResource(R.string.content_desc_search_characters)
-                        )
-                    }
-                }
-            }
-        )
+            )
+        }
         Box {
             CharactersLCE(characters = characters, onNavigate = onNavigate)
             if (state.isSearching) {
@@ -193,7 +202,9 @@ private fun Layout(
 
 @Composable
 private fun CharactersLCE(
-    characters: LazyPagingItems<UIOCharacter>, onNavigate: (GenericNavigation) -> Unit, modifier: Modifier = Modifier
+    characters: LazyPagingItems<UIOCharacterCard>,
+    onNavigate: (GenericNavigation) -> Unit,
+    modifier: Modifier = Modifier
 ) = when {
     characters.loadState.refresh is LoadState.Loading && characters.itemCount == 0 -> {
         Loading(modifier = Modifier.fillMaxSize())
@@ -211,15 +222,24 @@ private fun CharactersLCE(
 @Composable
 private fun Characters(
     modifier: Modifier,
-    characters: LazyPagingItems<UIOCharacter>,
+    characters: LazyPagingItems<UIOCharacterCard>,
     onNavigate: (GenericNavigation) -> Unit
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         items(count = characters.itemCount, key = characters.itemKey { it.id }) { index ->
             characters[index]?.let {
-                Text(it.name + it.isFavourite, modifier = Modifier.clickable {
-                    onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(it.id.toString())))
-                })
+                CharacterCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(it.id.toString())))
+                        },
+                    model = it
+                )
             }
         }
     }
@@ -247,8 +267,8 @@ private fun PreviewData() {
         Surface {
             Layout(
                 state = UIOCharacterScreenState.default(),
-                characters = MutableStateFlow(PagingData.from(UIOCharacter.forPreviewList())).collectAsLazyPagingItems(),
-                filteredCharacters = MutableStateFlow(PagingData.from(UIOCharacter.forPreviewList())).collectAsLazyPagingItems(),
+                characters = MutableStateFlow(PagingData.from(UIOCharacterCard.forPreviewList())).collectAsLazyPagingItems(),
+                filteredCharacters = MutableStateFlow(PagingData.from(UIOCharacterCard.forPreviewList())).collectAsLazyPagingItems(),
                 onNavigate = {},
                 onSearchTextChange = {},
                 onToggleSearch = {}
@@ -265,8 +285,8 @@ private fun PreviewSearch() {
         Surface {
             Layout(
                 state = UIOCharacterScreenState.previewSearchWithoutText(),
-                characters = MutableStateFlow(PagingData.from(UIOCharacter.forPreviewList())).collectAsLazyPagingItems(),
-                filteredCharacters = MutableStateFlow(PagingData.from(UIOCharacter.forPreviewList())).collectAsLazyPagingItems(),
+                characters = MutableStateFlow(PagingData.from(UIOCharacterCard.forPreviewList())).collectAsLazyPagingItems(),
+                filteredCharacters = MutableStateFlow(PagingData.from(UIOCharacterCard.forPreviewList())).collectAsLazyPagingItems(),
                 onNavigate = {},
                 onSearchTextChange = {},
                 onToggleSearch = {}
@@ -283,8 +303,8 @@ private fun PreviewSearchWithText() {
         Surface {
             Layout(
                 state = UIOCharacterScreenState.previewSearchWithText(),
-                characters = MutableStateFlow(PagingData.from(UIOCharacter.forPreviewList())).collectAsLazyPagingItems(),
-                filteredCharacters = MutableStateFlow(PagingData.from(UIOCharacter.forPreviewList())).collectAsLazyPagingItems(),
+                characters = MutableStateFlow(PagingData.from(UIOCharacterCard.forPreviewList())).collectAsLazyPagingItems(),
+                filteredCharacters = MutableStateFlow(PagingData.from(UIOCharacterCard.forPreviewList())).collectAsLazyPagingItems(),
                 onNavigate = {},
                 onSearchTextChange = {},
                 onToggleSearch = {}

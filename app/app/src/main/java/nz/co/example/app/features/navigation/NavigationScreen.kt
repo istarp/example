@@ -1,12 +1,7 @@
 package nz.co.example.app.features.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +12,6 @@ import nz.co.example.app.features.navigation.models.AppNavigationRoute
 import nz.co.example.app.features.navigation.models.GenericNavigation
 import nz.co.example.app.features.navigation.models.NavigationUp
 import nz.co.example.app.features.navigation.models.RouteNavigation
-import nz.co.example.app.features.navigation.models.topLevelRoutes
 
 @Composable
 internal fun NavigationScreen(
@@ -28,32 +22,25 @@ internal fun NavigationScreen(
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = Modifier.fillMaxSize()
+        enterTransition = navEnterTransition(),
+        exitTransition = navExitTransition(),
+        popEnterTransition = navPopEnterTransition(),
+        popExitTransition = navPopExitTransition(),
+        modifier = Modifier
     ) {
-        composable(
-            AppNavigationRoute.Characters.route,
-            exitTransition = exitTransition(),
-            popEnterTransition = popEnterTransition()
-        ) {
+        composable(AppNavigationRoute.Characters.route) {
             CharactersScreen(
                 modifier = modifier,
                 onNavigate = { handleNavigation(it, navController) }
             )
         }
-        composable(AppNavigationRoute.CharacterDetail().route,
-            enterTransition = { slideInFromLeft() },
-            exitTransition = { slideOutToRight() })
-        { entry ->
+        composable(AppNavigationRoute.CharacterDetail().route) { entry ->
             CharacterDetailScreen(
                 modifier = modifier,
                 characterId = AppNavigationRoute.CharacterDetail.getArg(entry),
                 onNavigate = { handleNavigation(it, navController) })
         }
-        composable(
-            AppNavigationRoute.Favourites.route,
-            exitTransition = exitTransition(),
-            popEnterTransition = popEnterTransition()
-        ) {
+        composable(AppNavigationRoute.Favourites.route) {
             FavouriteCharactersScreen(
                 modifier = modifier,
                 onNavigate = { handleNavigation(it, navController) }
@@ -61,24 +48,6 @@ internal fun NavigationScreen(
         }
     }
 }
-
-private fun exitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
-    {
-        if (topLevelRoutes.map { it.route }.contains(targetState.destination.route)) {
-            fadeOut()
-        } else {
-            slideOutToLeft()
-        }
-    }
-
-private fun popEnterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
-    {
-        if (topLevelRoutes.map { it.route }.contains(initialState.destination.route)) {
-            fadeIn()
-        } else {
-            slideInFromRight()
-        }
-    }
 
 private fun handleNavigation(navigation: GenericNavigation, navController: NavHostController) {
     when (navigation) {

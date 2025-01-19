@@ -11,6 +11,7 @@
     <string name="favourites_no_data">No favorites yet</string>
 
     <string name="content_desc_nav_back">Back</string>
+    <string name="content_desc_favourite">Favourite</string>
     <string name="content_desc_search_characters">Search characters</string>
     <string name="content_desc_set_as_favourite">As favourite</string>
     <string name="content_desc_set_as_not_favourite">Not favourite</string>

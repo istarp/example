@@ -4,20 +4,22 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import nz.co.example.app.R
 
-data class TopLevelRoute(@StringRes val title: Int, val route: String, @DrawableRes val icon: Int)
+data class TopLevelNavigation(@StringRes val title: Int, val route: String, @DrawableRes val icon: Int)
 
-val CharactersRoute =
-    TopLevelRoute(
+val CharactersNavigation =
+    TopLevelNavigation(
         title = R.string.nav_characters,
         route = AppNavigationRoute.Characters.route,
         icon = R.drawable.icon_characters
     )
-val FavouritesRoute = TopLevelRoute(
+val FavouritesNavigation = TopLevelNavigation(
     title = R.string.nav_favourites,
     route = AppNavigationRoute.Favourites.route,
-    icon = R.drawable.icon_favourites
+    icon = R.drawable.ic_nav_favourites
 )
 
-val topLevelRoutes = listOf(
-    CharactersRoute, FavouritesRoute
+val topLevelNavigation = listOf(
+    CharactersNavigation, FavouritesNavigation
 )
+
+val topLevelRoutes = topLevelNavigation.map { it.route }

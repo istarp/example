@@ -10,17 +10,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import nz.co.example.app.features.characters.models.UIOCharacter
+import nz.co.example.app.ui.components.charactercard.model.UIOCharacterCard
 import nz.co.example.app.features.characters.models.UIOCharacterScreenState
-import nz.co.example.app.features.characters.models.mapFrom
+import nz.co.example.app.ui.components.charactercard.model.mapFrom
 import nz.co.example.rickandmortymodule.RickAndMortyFacade
 
 internal class CharactersViewModel(private val rickAndMortyFacade: RickAndMortyFacade) : ViewModel() {
 
-    val data: StateFlow<PagingData<UIOCharacter>>
+    val data: StateFlow<PagingData<UIOCharacterCard>>
         field = MutableStateFlow(PagingData.empty())
 
-    val searchData: StateFlow<PagingData<UIOCharacter>>
+    val searchData: StateFlow<PagingData<UIOCharacterCard>>
         field = MutableStateFlow(PagingData.empty())
 
     val state: StateFlow<UIOCharacterScreenState>

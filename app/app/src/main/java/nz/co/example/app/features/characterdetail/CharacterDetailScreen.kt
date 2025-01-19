@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nz.co.example.app.R
-import nz.co.example.app.features.characters.models.UIOCharacter
+import nz.co.example.app.ui.components.charactercard.model.UIOCharacterCard
 import nz.co.example.app.features.navigation.models.GenericNavigation
 import nz.co.example.app.features.navigation.models.NavigationUp
 import nz.co.example.app.ui.components.BackButton
@@ -52,7 +52,7 @@ internal fun CharacterDetailScreen(
 
 @Composable
 private fun Layout(
-    data: LCEState<UIOCharacter>,
+    data: LCEState<UIOCharacterCard>,
     onNavigate: (GenericNavigation) -> Unit,
     onToggleFavourite: () -> Unit,
     modifier: Modifier = Modifier
@@ -81,7 +81,7 @@ private fun Layout(
                         IconButton(modifier = modifier, onClick = { onToggleFavourite() }) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_favourite),
+                                painter = painterResource(R.drawable.ic_not_favourite),
                                 contentDescription = stringResource(if (data.value.isFavourite) R.string.content_desc_set_as_not_favourite else R.string.content_desc_set_as_favourite),
                                 tint = if (data.value.isFavourite) Color.Red else Color.Gray
                             )
@@ -102,7 +102,7 @@ private fun Layout(
 }
 
 @Composable
-private fun Character(character: UIOCharacter, modifier: Modifier = Modifier) {
+private fun Character(character: UIOCharacterCard, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(character.name)
     }
@@ -128,7 +128,7 @@ private fun Error(modifier: Modifier = Modifier) {
 private fun Preview() {
     AppTheme {
         Surface {
-            Layout(data = LCEState.Content(UIOCharacter.forPreview()), onToggleFavourite = {}, onNavigate = {})
+            Layout(data = LCEState.Content(UIOCharacterCard.forPreview()), onToggleFavourite = {}, onNavigate = {})
         }
     }
 }
@@ -139,7 +139,7 @@ private fun Preview() {
 private fun PreviewFavourite() {
     AppTheme {
         Surface {
-            Layout(data = LCEState.Content(UIOCharacter.forPreviewFavourite()), onToggleFavourite = {}, onNavigate = {})
+            Layout(data = LCEState.Content(UIOCharacterCard.forPreviewFavourite()), onToggleFavourite = {}, onNavigate = {})
         }
     }
 }
