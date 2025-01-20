@@ -26,4 +26,4 @@ This is a repository for Example app
 * Some tests would be nice :)
 * Add some throttling when user searches
 * Network module should be abstracted so ktor is not leaked to higher level modules
-* Inroduce entity model for character as now network model is stored in db
+* Introduce entity model for character as now network model is stored in db
