@@ -16,7 +16,7 @@ This is a repository for Example app
 
 ## Build and run app
 * Using Android Studio -> File -> Open
-* Navigate to the folder where your project located, select choose app folder 
+* Navigate to the folder where your project located, *choose* app folder 
 * Wait for gradle to finish sync
 * Run app using Run app button (control+R)
 
