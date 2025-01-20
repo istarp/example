@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 internal data class DOCharacterRemoteKeys(
     @PrimaryKey val characterId: Int,
     val prevKey: Int?,
-    val nextKey: Int?
+    val nextKey: Int?,
+    val lastUpdated: Long
 )

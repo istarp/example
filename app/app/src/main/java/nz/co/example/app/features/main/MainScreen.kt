@@ -32,7 +32,7 @@ internal fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
     AppTheme {
         Scaffold(
-            containerColor = AppTheme.colors.background.backgroundPrimary,
+            containerColor = AppTheme.colors.background.primary,
             modifier = modifier,
             bottomBar = {
                 AnimatedVisibility(

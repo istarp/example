@@ -18,7 +18,7 @@ internal interface CharacterRemoteKeysDao {
     @Query("DELETE FROM characters_remote_keys")
     suspend fun clearAll()
 
-    @Query("SELECT * FROM characters_remote_keys ORDER BY characterId DESC LIMIT 1")
-    suspend fun getLastRemoteKey(): DOCharacterRemoteKeys?
+    @Query("SELECT * FROM characters_remote_keys ORDER BY characterId ASC LIMIT 1")
+    suspend fun getFirstRemoteKey(): DOCharacterRemoteKeys?
 
 }

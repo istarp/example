@@ -9,7 +9,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,8 +24,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +52,7 @@ import nz.co.example.app.features.navigation.models.RouteNavigation
 import nz.co.example.app.ui.components.BackButton
 import nz.co.example.app.ui.components.charactercard.CharacterCard
 import nz.co.example.app.ui.components.charactercard.model.UIOCharacterCard
+import nz.co.example.app.ui.components.topbar.TopAppBar
 import nz.co.example.app.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -95,86 +92,78 @@ private fun Layout(
         onToggleSearch()
     }
     Column(modifier = modifier) {
-        Surface(shadowElevation = 8.dp) {
-            TopAppBar(
-                modifier = Modifier,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.background.backgroundPrimary,
-                    scrolledContainerColor = Color.Transparent
-                ),
-                expandedHeight = 48.dp,
-                title = {
-                    Box(contentAlignment = Alignment.CenterStart) {
-                        Text(
-                            text = stringResource(R.string.characters_title),
-                            maxLines = 1,
-                            style = AppTheme.typography.headline.headline2,
-                            color = AppTheme.colors.foreground.foregroundPrimary,
-                            fontWeight = FontWeight.Bold,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        androidx.compose.animation.AnimatedVisibility(
-                            modifier = Modifier,
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                            visible = state.isSearching
-                        ) {
-                            TextField(
-                                modifier = Modifier.fillMaxWidth(),
-                                value = state.searchText,
-                                onValueChange = { text ->
-                                    onSearchTextChange(text)
-                                },
-                                placeholder = {
-                                    Text(
-                                        text = stringResource(R.string.search_characters_placeholder),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.Gray,
-                                    focusedContainerColor = Color.Gray,
-                                    unfocusedIndicatorColor = Color.Gray,
-                                    focusedIndicatorColor = Color.Gray
-                                )
-                            )
-
-                        }
-                    }
-                },
-                navigationIcon = {
-                    AnimatedVisibility(
-                        visible = state.isSearching,
-                        enter = expandHorizontally(),
-                        exit = shrinkHorizontally()
+        TopAppBar(
+            title = {
+                Box(contentAlignment = Alignment.CenterStart) {
+                    Text(
+                        text = stringResource(R.string.characters_title),
+                        maxLines = 1,
+                        style = AppTheme.typography.headline.headline2,
+                        color = AppTheme.colors.foreground.primary,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    androidx.compose.animation.AnimatedVisibility(
+                        modifier = Modifier,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                        visible = state.isSearching
                     ) {
-                        BackButton(onClick = { onToggleSearch() })
-                    }
-                },
-                actions = {
-                    AnimatedVisibility(visible = !state.isSearching) {
-                        IconButton(modifier = modifier, onClick = { onToggleSearch() }) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_search),
-                                contentDescription = stringResource(R.string.content_desc_search_characters),
-                                tint = AppTheme.colors.foreground.foregroundPrimary,
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = state.searchText,
+                            onValueChange = { text ->
+                                onSearchTextChange(text)
+                            },
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.search_characters_placeholder),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.Gray,
+                                focusedContainerColor = Color.Gray,
+                                unfocusedIndicatorColor = Color.Gray,
+                                focusedIndicatorColor = Color.Gray
                             )
-                        }
-                    }
-                    AnimatedVisibility(visible = state.isSearching && state.searchText.isNotBlank()) {
-                        IconButton(modifier = modifier, onClick = { onSearchTextChange("") }) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_close),
-                                contentDescription = stringResource(R.string.content_desc_search_characters)
-                            )
-                        }
+                        )
+
                     }
                 }
-            )
-        }
+            },
+            navigationIcon = {
+                AnimatedVisibility(
+                    visible = state.isSearching,
+                    enter = expandHorizontally(),
+                    exit = shrinkHorizontally()
+                ) {
+                    BackButton(onClick = { onToggleSearch() })
+                }
+            },
+            actions = {
+                AnimatedVisibility(visible = !state.isSearching) {
+                    IconButton(modifier = modifier, onClick = { onToggleSearch() }) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(R.drawable.ic_search),
+                            contentDescription = stringResource(R.string.content_desc_search_characters),
+                            tint = AppTheme.colors.foreground.primary,
+                        )
+                    }
+                }
+                AnimatedVisibility(visible = state.isSearching && state.searchText.isNotBlank()) {
+                    IconButton(modifier = modifier, onClick = { onSearchTextChange("") }) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = stringResource(R.string.content_desc_search_characters)
+                        )
+                    }
+                }
+            }
+        )
+
         Box {
             CharactersLCE(characters = characters, onNavigate = onNavigate)
             if (state.isSearching) {
@@ -233,12 +222,11 @@ private fun Characters(
         items(count = characters.itemCount, key = characters.itemKey { it.id }) { index ->
             characters[index]?.let {
                 CharacterCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(it.id.toString())))
-                        },
-                    model = it
+                    modifier = Modifier.fillMaxWidth(),
+                    model = it,
+                    onClick = { card ->
+                        onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(card.id.toString())))
+                    }
                 )
             }
         }

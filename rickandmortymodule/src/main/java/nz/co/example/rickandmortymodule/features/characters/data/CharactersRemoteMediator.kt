@@ -10,12 +10,27 @@ import nz.co.example.coremodule.common.NetworkResult
 import nz.co.example.rickandmortymodule.features.characters.data.models.DOCharacter
 import nz.co.example.rickandmortymodule.features.characters.data.models.DOCharacterRemoteKeys
 import nz.co.example.rickandmortymodule.features.database.Database
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalPagingApi::class)
 internal class CharactersRemoteMediator(
     private val database: Database,
     private val service: CharactersService
 ) : RemoteMediator<Int, DOCharacter>() {
+
+    override suspend fun initialize(): InitializeAction {
+        val remoteKey = database.withTransaction {
+            database.charactersRemoteKeysDao.getFirstRemoteKey()
+        } ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
+
+        val cacheTimeout = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES)
+        return if (System.currentTimeMillis() - remoteKey.lastUpdated <= cacheTimeout) {
+            InitializeAction.SKIP_INITIAL_REFRESH
+        } else {
+            InitializeAction.LAUNCH_INITIAL_REFRESH
+        }
+    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, DOCharacter>
@@ -46,18 +61,14 @@ internal class CharactersRemoteMediator(
                     val nextKey = if ((endOfPaginationReached)) null else page.plus(1)
 
                     database.withTransaction {
-//                        if (loadType == LoadType.REFRESH) {
-//                            database.charactersRemoteKeysDao.clearAll()
-//                            database.charactersDao.clearAll()
-//                        }
-
                         database.charactersDao.insertAll(response.data.results)
 
                         val remoteKeys = response.data.results.map {
                             DOCharacterRemoteKeys(
                                 characterId = it.id,
                                 prevKey = prevKey,
-                                nextKey = nextKey
+                                nextKey = nextKey,
+                                lastUpdated = System.currentTimeMillis()
                             )
                         }
                         database.charactersRemoteKeysDao.insertAll(remoteKeys)

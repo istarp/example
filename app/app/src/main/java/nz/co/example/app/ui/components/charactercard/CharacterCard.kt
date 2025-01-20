@@ -1,6 +1,7 @@
 package nz.co.example.app.ui.components.charactercard
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,14 +28,23 @@ import nz.co.example.app.ui.components.image.Image
 import nz.co.example.app.ui.theme.AppTheme
 
 @Composable
-internal fun CharacterCard(modifier: Modifier = Modifier, model: UIOCharacterCard) {
+internal fun CharacterCard(
+    modifier: Modifier = Modifier,
+    model: UIOCharacterCard,
+    onClick: (UIOCharacterCard) -> Unit
+) {
     Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.background.backgroundTertiary),
+        modifier = Modifier,
+        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.background.tertiary),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = modifier
+                .clickable { onClick(model) }
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Image(
                 modifier = Modifier
                     .size(44.dp)
@@ -48,7 +58,7 @@ internal fun CharacterCard(modifier: Modifier = Modifier, model: UIOCharacterCar
                         modifier = Modifier.weight(1f, false),
                         text = model.name,
                         style = AppTheme.typography.headline.headline3,
-                        color = AppTheme.colors.foreground.foregroundPrimary
+                        color = AppTheme.colors.foreground.primary
                     )
                     if (model.isFavourite) {
                         Box(modifier = Modifier.width(8.dp))
@@ -56,19 +66,18 @@ internal fun CharacterCard(modifier: Modifier = Modifier, model: UIOCharacterCar
                             modifier = Modifier.size(16.dp),
                             painter = painterResource(R.drawable.ic_favourite),
                             contentDescription = stringResource(R.string.content_desc_favourite),
-                            tint = AppTheme.colors.accent.accentPrimary
+                            tint = AppTheme.colors.accent.primary
                         )
                     }
                 }
                 Text(
                     text = model.status,
                     style = AppTheme.typography.paragraph.small,
-                    color = AppTheme.colors.foreground.foregroundSecondary
+                    color = AppTheme.colors.foreground.secondary
                 )
             }
         }
     }
-
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
@@ -77,7 +86,7 @@ internal fun CharacterCard(modifier: Modifier = Modifier, model: UIOCharacterCar
 private fun Preview() {
     AppTheme {
         Surface {
-            CharacterCard(model = UIOCharacterCard.forPreview())
+            CharacterCard(model = UIOCharacterCard.forPreview(), onClick = {})
         }
     }
 }

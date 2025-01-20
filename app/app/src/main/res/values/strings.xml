@@ -10,6 +10,14 @@
     <string name="favourites_title">Favourites</string>
     <string name="favourites_no_data">No favorites yet</string>
 
+    <string name="character_detail_name">Name</string>
+    <string name="character_detail_status">Status</string>
+    <string name="character_detail_species">Species</string>
+    <string name="character_detail_type">Type</string>
+    <string name="character_detail_gender">Gender</string>
+    <string name="character_detail_origin">Origin</string>
+    <string name="character_detail_location">Location</string>
+
     <string name="content_desc_nav_back">Back</string>
     <string name="content_desc_favourite">Favourite</string>
     <string name="content_desc_search_characters">Search characters</string>

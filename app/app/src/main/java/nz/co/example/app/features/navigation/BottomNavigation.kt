@@ -11,7 +11,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,36 +22,36 @@ import nz.co.example.app.ui.theme.AppTheme
 
 @Composable
 internal fun BottomNavigation(currentDestination: String?, onItemClicked: (String) -> Unit) {
-    NavigationBar(
-        tonalElevation = 20.dp,
-        modifier = Modifier.clip(RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp)),
-        containerColor = AppTheme.colors.background.backgroundBottomNavigation,
-    ) {
-        topLevelNavigation.forEach { topLevelRoute ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        painter = painterResource(topLevelRoute.icon),
-                        contentDescription = stringResource(topLevelRoute.title)
+    Surface(shadowElevation = 12.dp, shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp)) {
+        NavigationBar(
+            containerColor = AppTheme.colors.background.bottomNavigation,
+        ) {
+            topLevelNavigation.forEach { topLevelRoute ->
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            painter = painterResource(topLevelRoute.icon),
+                            contentDescription = stringResource(topLevelRoute.title)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(topLevelRoute.title),
+                            style = AppTheme.typography.navigation.bottomNavigation
+                        )
+                    },
+                    selected = topLevelRoute.route == currentDestination,
+                    onClick = { onItemClicked(topLevelRoute.route) },
+                    colors = NavigationBarItemDefaults.colors().copy(
+                        selectedIconColor = AppTheme.colors.accent.primary,
+                        selectedTextColor = AppTheme.colors.accent.primary,
+                        unselectedIconColor = AppTheme.colors.foreground.tertiary,
+                        unselectedTextColor = AppTheme.colors.foreground.tertiary,
+                        selectedIndicatorColor = Color.Transparent
                     )
-                },
-                label = {
-                    Text(
-                        text = stringResource(topLevelRoute.title),
-                        style = AppTheme.typography.navigation.bottomNavigation
-                    )
-                },
-                selected = topLevelRoute.route == currentDestination,
-                onClick = { onItemClicked(topLevelRoute.route) },
-                colors = NavigationBarItemDefaults.colors().copy(
-                    selectedIconColor = AppTheme.colors.accent.accentPrimary,
-                    selectedTextColor = AppTheme.colors.accent.accentPrimary,
-                    unselectedIconColor = AppTheme.colors.foreground.foregroundTertiary,
-                    unselectedTextColor = AppTheme.colors.foreground.foregroundTertiary,
-                    selectedIndicatorColor = Color.Transparent
                 )
-            )
+            }
         }
     }
 }
