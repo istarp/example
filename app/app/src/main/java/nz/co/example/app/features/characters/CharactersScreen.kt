@@ -9,14 +9,19 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,6 +58,7 @@ import nz.co.example.app.features.navigation.models.RouteNavigation
 import nz.co.example.app.ui.components.BackButton
 import nz.co.example.app.ui.components.charactercard.CharacterCard
 import nz.co.example.app.ui.components.charactercard.model.UIOCharacterCard
+import nz.co.example.app.ui.components.image.Image
 import nz.co.example.app.ui.components.topbar.TopAppBar
 import nz.co.example.app.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
@@ -103,13 +110,14 @@ private fun Layout(
                         overflow = TextOverflow.Ellipsis
                     )
                     androidx.compose.animation.AnimatedVisibility(
-                        modifier = Modifier,
                         enter = fadeIn(),
                         exit = fadeOut(),
                         visible = state.isSearching
                     ) {
                         TextField(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(AppTheme.colors.background.primary),
                             value = state.searchText,
                             onValueChange = { text ->
                                 onSearchTextChange(text)
@@ -118,17 +126,21 @@ private fun Layout(
                                 Text(
                                     text = stringResource(R.string.search_characters_placeholder),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = AppTheme.typography.paragraph.medium,
+                                    color = AppTheme.colors.foreground.secondary
                                 )
                             },
+                            textStyle = AppTheme.typography.paragraph.medium,
                             colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Color.Gray,
-                                focusedContainerColor = Color.Gray,
-                                unfocusedIndicatorColor = Color.Gray,
-                                focusedIndicatorColor = Color.Gray
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                focusedTextColor = AppTheme.colors.foreground.primary,
+                                unfocusedTextColor = AppTheme.colors.foreground.primary
                             )
                         )
-
                     }
                 }
             },
@@ -165,24 +177,15 @@ private fun Layout(
         )
 
         Box {
-            CharactersLCE(characters = characters, onNavigate = onNavigate)
-            if (state.isSearching) {
-                Crossfade(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Red),
-                    targetState = filteredCharacters,
-                    label = "characters search"
-                ) {
-                    if (it.itemCount != 0) {
-                        Characters(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Red),
-                            characters = it,
-                            onNavigate = onNavigate
-                        )
-                    }
+            Crossfade(
+                modifier = Modifier
+                    .fillMaxSize(),
+                targetState = state.isSearching,
+                label = "characters search"
+            ) { isSearching ->
+                when (isSearching) {
+                    false -> CharactersLCE(characters = characters, onNavigate = onNavigate)
+                    true -> FilteredCharacters(characters = filteredCharacters, onNavigate = onNavigate)
                 }
             }
         }
@@ -229,6 +232,71 @@ private fun Characters(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun FilteredCharacters(
+    modifier: Modifier = Modifier,
+    characters: LazyPagingItems<UIOCharacterCard>,
+    onNavigate: (GenericNavigation) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(count = characters.itemCount, key = characters.itemKey { it.id }) { index ->
+            characters[index]?.let {
+                FilteredCharacter(
+                    modifier = Modifier.fillMaxWidth(),
+                    name = it.name,
+                    imageUrl = it.imageUrl,
+                    status = it.status,
+                    onNavigate = onNavigate
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun FilteredCharacter(
+    modifier: Modifier = Modifier,
+    name: String,
+    imageUrl: String,
+    status: String,
+    onNavigate: (GenericNavigation) -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .clickable { onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(name))) }
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            imageUrl = imageUrl
+        )
+        Box(modifier = Modifier.width(8.dp))
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    modifier = Modifier.weight(1f, false),
+                    text = name,
+                    style = AppTheme.typography.headline.headline3,
+                    color = AppTheme.colors.foreground.primary
+                )
+            }
+            Text(
+                text = status,
+                style = AppTheme.typography.paragraph.small,
+                color = AppTheme.colors.foreground.secondary
+            )
         }
     }
 }
