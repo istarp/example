@@ -1,6 +1,6 @@
 # Android Example App
 
-This is a repository for Example app
+Goal of this app is to display a bunch of information about the characters of the Rick and Morty universe. Don't know Rick and Morty? Well it's a shame, because it's the best TV show!
 
 ## Setup dev environment
 
