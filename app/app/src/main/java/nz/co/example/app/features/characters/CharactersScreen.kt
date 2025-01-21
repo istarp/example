@@ -251,6 +251,7 @@ private fun FilteredCharacters(
             characters[index]?.let {
                 FilteredCharacter(
                     modifier = Modifier.fillMaxWidth(),
+                    id = it.id.toString(),
                     name = it.name,
                     imageUrl = it.imageUrl,
                     status = it.status,
@@ -261,10 +262,10 @@ private fun FilteredCharacters(
     }
 }
 
-
 @Composable
 private fun FilteredCharacter(
     modifier: Modifier = Modifier,
+    id: String,
     name: String,
     imageUrl: String,
     status: String,
@@ -272,7 +273,7 @@ private fun FilteredCharacter(
 ) {
     Row(
         modifier = modifier
-            .clickable { onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(name))) }
+            .clickable { onNavigate(RouteNavigation(AppNavigationRoute.CharacterDetail.createRoute(id))) }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

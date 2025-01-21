@@ -10,6 +10,7 @@ import androidx.paging.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import nz.co.example.coremodule.common.NetworkResult
 import nz.co.example.coremodule.common.Result
 import nz.co.example.coremodule.features.coroutinedispatchers.CoroutineDispatchersFeature
 import nz.co.example.rickandmortymodule.features.characters.business.CharactersRepository
@@ -24,12 +25,10 @@ internal class CharactersRepositoryImpl(
 ) : CharactersRepository {
 
     override suspend fun getCharacters(): Flow<PagingData<Character>> {
-        return Pager(
-            config = PagingConfig(pageSize = 100),
+        return Pager(config = PagingConfig(pageSize = 100),
             initialKey = 1,
             remoteMediator = CharactersRemoteMediator(service = service, database = database),
-            pagingSourceFactory = { database.charactersDao.getCharacters() }
-        ).flow.map { pagingData ->
+            pagingSourceFactory = { database.charactersDao.getCharacters() }).flow.map { pagingData ->
             pagingData.map { page ->
                 mapFrom(page)
             }
@@ -58,6 +57,16 @@ internal class CharactersRepositoryImpl(
 
     override suspend fun getCharacter(id: String): Flow<Result<Character>> {
         return withContext(dispatchers.io()) {
+            if (database.charactersDao.retrieveCharacter(id) == null) {
+                when (val result = service.getCharacter(id)) {
+                    is NetworkResult.Success -> Result.Data(mapFrom(result.data)).also {
+                        database.charactersDao.insertAll(listOf(result.data))
+                    }
+
+                    else -> {}
+                }
+            }
+
             database.charactersDao.getCharacter(id).map {
                 if (it != null) {
                     Result.Data(mapFrom(it))
